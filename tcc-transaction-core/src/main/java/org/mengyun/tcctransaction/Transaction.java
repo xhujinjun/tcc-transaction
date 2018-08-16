@@ -1,6 +1,8 @@
 package org.mengyun.tcctransaction;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import org.mengyun.tcctransaction.api.TransactionContext;
 import org.mengyun.tcctransaction.api.TransactionStatus;
 import org.mengyun.tcctransaction.api.TransactionXid;
@@ -15,28 +17,59 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * TCC事务
+ *
  * Created by changmingxie on 10/26/15.
  */
 public class Transaction implements Serializable {
 
     private static final long serialVersionUID = 7291423944314337931L;
-
+    /**
+     * 事务编号
+     *      用于唯一标识一个事务(使用 UUID 算法生成，保证唯一性)
+     */
     private TransactionXid xid;
-
+    /**
+     * 事务状态
+     *  trying, confirming, cancelling
+     */
+    @Getter
     private TransactionStatus status;
-
+    /**
+     * 事务类型
+     *   root, branch
+     */
+    @Getter
     private TransactionType transactionType;
-
+    /**
+     * 重试次数
+     */
+    @Getter
     private volatile int retriedCount = 0;
-
+    /**
+     * 创建时间
+     */
+    @Getter
     private Date createTime = new Date();
-
+    /**
+     * 最好更新时间
+     */
+    @Getter @Setter
     private Date lastUpdateTime = new Date();
-
+    /**
+     * 版本号
+     */
+    @Getter @Setter
     private long version = 1;
-
+    /**
+     * 事务参与者
+     */
+    @Getter
     private List<Participant> participants = new ArrayList<Participant>();
-
+    /**
+     * 附加属性
+     */
+    @Getter
     private Map<String, Object> attachments = new ConcurrentHashMap<String, Object>();
 
     public Transaction() {
@@ -55,48 +88,39 @@ public class Transaction implements Serializable {
         this.transactionType = transactionType;
     }
 
+    /**
+     * 招募参与者
+     */
     public void enlistParticipant(Participant participant) {
         participants.add(participant);
     }
 
-
-    public Xid getXid() {
-        return xid.clone();
-    }
-
-    public TransactionStatus getStatus() {
-        return status;
-    }
-
-
-    public List<Participant> getParticipants() {
-        return participants;
-    }
-
-    public TransactionType getTransactionType() {
-        return transactionType;
-    }
-
-    public void changeStatus(TransactionStatus status) {
-        this.status = status;
-    }
-
-
+    /**
+     * 提交TCC事务
+     *   调用参与者们提交事务
+     */
     public void commit() {
-
         for (Participant participant : participants) {
             participant.commit();
         }
     }
 
+    /**
+     * 回滚TCC事务
+     *  调用参与者们回滚事务
+     */
     public void rollback() {
         for (Participant participant : participants) {
             participant.rollback();
         }
     }
 
-    public int getRetriedCount() {
-        return retriedCount;
+    public Xid getXid() {
+        return xid.clone();
+    }
+
+    public void changeStatus(TransactionStatus status) {
+        this.status = status;
     }
 
     public void addRetriedCount() {
@@ -107,32 +131,8 @@ public class Transaction implements Serializable {
         this.retriedCount = retriedCount;
     }
 
-    public Map<String, Object> getAttachments() {
-        return attachments;
-    }
-
-    public long getVersion() {
-        return version;
-    }
-
     public void updateVersion() {
         this.version++;
-    }
-
-    public void setVersion(long version) {
-        this.version = version;
-    }
-
-    public Date getLastUpdateTime() {
-        return lastUpdateTime;
-    }
-
-    public void setLastUpdateTime(Date date) {
-        this.lastUpdateTime = date;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
     }
 
     public void updateTime() {

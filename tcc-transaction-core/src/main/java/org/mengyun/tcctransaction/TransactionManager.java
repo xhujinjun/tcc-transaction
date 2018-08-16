@@ -10,6 +10,9 @@ import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 
 /**
+ * 事务管理
+ *
+ *  提供事务的获取，发起,提交，回滚等操作
  * Created by changmingxie on 10/26/15.
  */
 public class TransactionManager {
@@ -33,10 +36,16 @@ public class TransactionManager {
     public TransactionManager() {
     }
 
+    /**
+     * 开始事务
+     * @return
+     */
     public Transaction begin() {
 
         Transaction transaction = new Transaction(TransactionType.ROOT);
+        //记录事务日志
         transactionRepository.create(transaction);
+        //注册事务
         registerTransaction(transaction);
         return transaction;
     }
@@ -62,6 +71,10 @@ public class TransactionManager {
         }
     }
 
+    /**
+     * 确认业务
+     * @param asyncCommit
+     */
     public void commit(boolean asyncCommit) {
 
         final Transaction transaction = getCurrentTransaction();
@@ -89,8 +102,11 @@ public class TransactionManager {
             commitTransaction(transaction);
         }
     }
-    
 
+    /**
+     * 回滚业务
+     * @param asyncRollback
+     */
     public void rollback(boolean asyncRollback) {
 
         final Transaction transaction = getCurrentTransaction();
@@ -145,6 +161,10 @@ public class TransactionManager {
         return null;
     }
 
+    /**
+     * 是否已经激活事务
+     * @return
+     */
     public boolean isTransactionActive() {
         Deque<Transaction> transactions = CURRENT.get();
         return transactions != null && !transactions.isEmpty();
@@ -171,7 +191,10 @@ public class TransactionManager {
         }
     }
 
-
+    /**
+     * 招募的参与者
+     * @param participant
+     */
     public void enlistParticipant(Participant participant) {
         Transaction transaction = this.getCurrentTransaction();
         transaction.enlistParticipant(participant);

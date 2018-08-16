@@ -27,6 +27,13 @@ public class CompensableMethodUtils {
         return method;
     }
 
+    /**
+     *
+     * @param propagation
+     * @param isTransactionActive
+     * @param transactionContext
+     * @return
+     */
     public static MethodType calculateMethodType(Propagation propagation, boolean isTransactionActive, TransactionContext transactionContext) {
 
         if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && transactionContext == null) ||

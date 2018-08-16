@@ -6,6 +6,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
 /**
+ * 资源协调组织面
+ *  也是拦截org.mengyun.tcctransaction.api.Compensable注解
+ *  只是order要小于CompensableTransactionInterceptor
+ *
  * Created by changmingxie on 11/8/15.
  */
 @Aspect

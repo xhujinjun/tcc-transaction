@@ -20,7 +20,7 @@
 
     <properties>
         <springframework.version>3.2.12.RELEASE</springframework.version>
-
+        <lombok.version>1.16.16</lombok.version>
         <java.src.version>1.6</java.src.version>
         <java.target.version>1.6</java.target.version>
         <project.encoding>UTF-8</project.encoding>
@@ -37,9 +37,12 @@
 
 
     <dependencyManagement>
-
-
         <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.mengyun</groupId>
                 <artifactId>tcc-transaction-api</artifactId>

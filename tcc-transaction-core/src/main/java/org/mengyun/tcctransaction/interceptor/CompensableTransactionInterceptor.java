@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 /**
+ * 可补偿事务拦截器
  * Created by changmingxie on 10/30/15.
  */
 public class CompensableTransactionInterceptor {
@@ -71,10 +72,16 @@ public class CompensableTransactionInterceptor {
         }
     }
 
-
+    /**
+     * 1. 开启事务
+     * 2. 执行业务逻辑
+     * 3. 提交事务（无异常）
+     * 4. 取消事务（有异常）  回滚或重试
+     * 5. 清理资源
+     */
     private Object rootMethodProceed(ProceedingJoinPoint pjp, boolean asyncConfirm, boolean asyncCancel) throws Throwable {
 
-        Object returnValue = null;
+        Object returnValue;
 
         Transaction transaction = null;
 
@@ -83,6 +90,7 @@ public class CompensableTransactionInterceptor {
             transaction = transactionManager.begin();
 
             try {
+                //继续处理try阶段逻辑
                 returnValue = pjp.proceed();
             } catch (Throwable tryingException) {
 
@@ -105,6 +113,9 @@ public class CompensableTransactionInterceptor {
         return returnValue;
     }
 
+    /**
+     *
+     */
     private Object providerMethodProceed(ProceedingJoinPoint pjp, TransactionContext transactionContext, boolean asyncConfirm, boolean asyncCancel) throws Throwable {
 
         Transaction transaction = null;

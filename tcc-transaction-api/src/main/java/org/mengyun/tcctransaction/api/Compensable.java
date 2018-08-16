@@ -7,23 +7,42 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
 /**
+ * 可补偿的方法
+ *
  * Created by changmingxie on 10/25/15.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface Compensable {
+    /**
+     * 事务传播级别
+     */
+    Propagation propagation() default Propagation.REQUIRED;
 
-    public Propagation propagation() default Propagation.REQUIRED;
+    /**
+     * 确认执行业务方法
+     */
+    String confirmMethod() default "";
 
-    public String confirmMethod() default "";
+    /**
+     * 是否异步确认业务方法
+     */
+    boolean asyncConfirm() default false;
 
-    public String cancelMethod() default "";
+    /**
+     * 取消执行业务方法
+     */
+    String cancelMethod() default "";
 
-    public Class<? extends TransactionContextEditor> transactionContextEditor() default DefaultTransactionContextEditor.class;
+    /**
+     * 是否异步执行取消方法
+     */
+    boolean asyncCancel() default false;
 
-    public boolean asyncConfirm() default false;
-
-    public boolean asyncCancel() default false;
+    /**
+     * 事务上下文编辑(用于设置和获取事务上下文)
+     */
+    Class<? extends TransactionContextEditor> transactionContextEditor() default DefaultTransactionContextEditor.class;
 
     class NullableTransactionContextEditor implements TransactionContextEditor {
 
