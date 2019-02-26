@@ -8,6 +8,8 @@ import org.mengyun.tcctransaction.support.TransactionConfigurator;
 import org.springframework.core.Ordered;
 
 /**
+ * 可补偿事务织面配置信息
+ *
  * Created by changmingxie on 10/30/15.
  */
 @Aspect

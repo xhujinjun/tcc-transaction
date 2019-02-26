@@ -16,6 +16,7 @@
         <module>tcc-transaction-http-sample</module>
         <module>tcc-transaction-server-sample</module>
         <module>tcc-transaction-sample-domain</module>
+        <module>tcc-transaction-spring-boot</module>
     </modules>
 
 

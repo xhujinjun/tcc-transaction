@@ -29,7 +29,7 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
 
     @Override
     @Compensable(confirmMethod = "confirmRecord", cancelMethod = "cancelRecord", transactionContextEditor = MethodTransactionContextEditor.class)
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public String record(TransactionContext transactionContext, CapitalTradeOrderDto tradeOrderDto) {
 
         try {

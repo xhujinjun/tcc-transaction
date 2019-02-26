@@ -3,6 +3,8 @@ package org.mengyun.tcctransaction;
 import java.io.Serializable;
 
 /**
+ * 方法调用上下文
+ *
  * Created by changmingxie on 11/9/15.
  */
 public class InvocationContext implements Serializable {

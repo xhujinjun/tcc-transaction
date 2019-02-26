@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * 恢复事务的任务配置信息
+ *
  * Created by changming.xie on 6/1/16.
  */
 public class DefaultRecoverConfig implements RecoverConfig {

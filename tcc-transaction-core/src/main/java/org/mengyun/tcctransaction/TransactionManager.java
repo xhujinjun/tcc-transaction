@@ -78,9 +78,7 @@ public class TransactionManager {
     public void commit(boolean asyncCommit) {
 
         final Transaction transaction = getCurrentTransaction();
-
         transaction.changeStatus(TransactionStatus.CONFIRMING);
-
         transactionRepository.update(transaction);
 
         if (asyncCommit) {

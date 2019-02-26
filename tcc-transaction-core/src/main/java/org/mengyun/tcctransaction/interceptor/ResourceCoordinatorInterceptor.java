@@ -17,26 +17,24 @@ import org.mengyun.tcctransaction.utils.ReflectionUtils;
 import java.lang.reflect.Method;
 
 /**
+ * 资源协调器拦截器
  * Created by changmingxie on 11/8/15.
  */
 public class ResourceCoordinatorInterceptor {
 
     private TransactionManager transactionManager;
 
-
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
     public Object interceptTransactionContextMethod(ProceedingJoinPoint pjp) throws Throwable {
-
         Transaction transaction = transactionManager.getCurrentTransaction();
 
         if (transaction != null) {
-
             switch (transaction.getStatus()) {
                 case TRYING:
-                    enlistParticipant(pjp);
+                    enlistParticipant(pjp); //招募参与者
                     break;
                 case CONFIRMING:
                     break;
@@ -62,8 +60,15 @@ public class ResourceCoordinatorInterceptor {
         Transaction transaction = transactionManager.getCurrentTransaction();
         TransactionXid xid = new TransactionXid(transaction.getXid().getGlobalTransactionId());
 
-        if (FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance().get(pjp.getTarget(), method, pjp.getArgs()) == null) {
-            FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance().set(new TransactionContext(xid, TransactionStatus.TRYING.getId()), pjp.getTarget(), ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
+        //设置事务上下文
+        boolean notExistTransactionContext = FactoryBuilder.factoryOf(compensable.transactionContextEditor())
+                                  .getInstance()
+                                  .get(pjp.getTarget(), method, pjp.getArgs()) == null;
+        if (notExistTransactionContext) {
+            FactoryBuilder.factoryOf(compensable.transactionContextEditor())
+                          .getInstance()
+                          .set(new TransactionContext(xid, TransactionStatus.TRYING.getId()), pjp.getTarget()
+                                  , ((MethodSignature) pjp.getSignature()).getMethod(), pjp.getArgs());
         }
 
         Class targetClass = ReflectionUtils.getDeclaringType(pjp.getTarget().getClass(), method.getName(), method.getParameterTypes());
@@ -76,16 +81,12 @@ public class ResourceCoordinatorInterceptor {
                 cancelMethodName,
                 method.getParameterTypes(), pjp.getArgs());
 
-        Participant participant =
-                new Participant(
+        Participant participant = new Participant(
                         xid,
                         confirmInvocation,
                         cancelInvocation,
                         compensable.transactionContextEditor());
 
         transactionManager.enlistParticipant(participant);
-
     }
-
-
 }

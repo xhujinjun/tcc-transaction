@@ -1,6 +1,7 @@
 package org.mengyun.tcctransaction.recover;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.mengyun.tcctransaction.OptimisticLockException;
@@ -15,23 +16,26 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 事务恢复器
+ *
  * Created by changmingxie on 11/10/15.
  */
+@Slf4j
 public class TransactionRecovery {
-
-    static final Logger logger = Logger.getLogger(TransactionRecovery.class.getSimpleName());
 
     private TransactionConfigurator transactionConfigurator;
 
+    /**
+     * 开启事务恢复（job调用入口）
+     */
     public void startRecover() {
-
+        //查询执行异常的事务列表
         List<Transaction> transactions = loadErrorTransactions();
-
+        //恢复事务
         recoverErrorTransactions(transactions);
     }
 
     private List<Transaction> loadErrorTransactions() {
-
 
         long currentTimeInMillis = Calendar.getInstance().getTimeInMillis();
 
@@ -43,12 +47,11 @@ public class TransactionRecovery {
 
     private void recoverErrorTransactions(List<Transaction> transactions) {
 
-
         for (Transaction transaction : transactions) {
 
             if (transaction.getRetriedCount() > transactionConfigurator.getRecoverConfig().getMaxRetryCount()) {
 
-                logger.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)));
+                log.error(String.format("recover failed with max retry count,will not try again. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)));
                 continue;
             }
 
@@ -83,9 +86,9 @@ public class TransactionRecovery {
 
                 if (throwable instanceof OptimisticLockException
                         || ExceptionUtils.getRootCause(throwable) instanceof OptimisticLockException) {
-                    logger.warn(String.format("optimisticLockException happened while recover. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
+                    log.warn(String.format("optimisticLockException happened while recover. txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
                 } else {
-                    logger.error(String.format("recover failed, txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
+                    log.error(String.format("recover failed, txid:%s, status:%s,retried count:%d,transaction content:%s", transaction.getXid(), transaction.getStatus().getId(), transaction.getRetriedCount(), JSON.toJSONString(transaction)), throwable);
                 }
             }
         }

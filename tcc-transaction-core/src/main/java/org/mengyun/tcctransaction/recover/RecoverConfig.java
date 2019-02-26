@@ -3,19 +3,21 @@ package org.mengyun.tcctransaction.recover;
 import java.util.Set;
 
 /**
+ * 事务回复配置
+ *
  * Created by changming.xie on 6/1/16.
  */
 public interface RecoverConfig {
 
-    public int getMaxRetryCount();
+    int getMaxRetryCount();
 
-    public int getRecoverDuration();
+    int getRecoverDuration();
 
-    public String getCronExpression();
+    String getCronExpression();
 
-    public Set<Class<? extends Exception>> getDelayCancelExceptions();
+    Set<Class<? extends Exception>> getDelayCancelExceptions();
 
-    public void setDelayCancelExceptions(Set<Class<? extends Exception>> delayRecoverExceptions);
+    void setDelayCancelExceptions(Set<Class<? extends Exception>> delayRecoverExceptions);
 
-    public int getAsyncTerminateThreadPoolSize();
+    int getAsyncTerminateThreadPoolSize();
 }

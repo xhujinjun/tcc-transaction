@@ -27,15 +27,17 @@ public class PaymentServiceImpl {
     OrderRepository orderRepository;
 
 
+    /**
+     * 支付
+     */
     @Compensable(confirmMethod = "confirmMakePayment", cancelMethod = "cancelMakePayment", asyncConfirm = true)
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public void makePayment(Order order, BigDecimal redPacketPayAmount, BigDecimal capitalPayAmount) {
 
         System.out.println("order try make payment called.time seq:" + DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
 
         //check if the order status is DRAFT, if no, means that another call makePayment for the same order happened, ignore this call makePayment.
         if (order.getStatus().equals("DRAFT")) {
-
             order.pay(redPacketPayAmount, capitalPayAmount);
             try {
                 orderRepository.updateOrder(order);

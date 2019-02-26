@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
+ * 终结者
+ *
  * Created by changmingxie on 10/30/15.
  */
 public class Terminator implements Serializable {
@@ -29,9 +31,7 @@ public class Terminator implements Serializable {
 
                 Object target = FactoryBuilder.factoryOf(invocationContext.getTargetClass()).getInstance();
 
-                Method method = null;
-
-                method = target.getClass().getMethod(invocationContext.getMethodName(), invocationContext.getParameterTypes());
+                Method method = target.getClass().getMethod(invocationContext.getMethodName(), invocationContext.getParameterTypes());
 
                 FactoryBuilder.factoryOf(transactionContextEditorClass).getInstance().set(transactionContext, target, method, invocationContext.getArgs());
 

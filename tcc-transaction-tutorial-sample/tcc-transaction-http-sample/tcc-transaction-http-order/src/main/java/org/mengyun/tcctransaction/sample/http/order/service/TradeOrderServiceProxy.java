@@ -16,10 +16,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TradeOrderServiceProxy {
-
+    /**
+     * 资金账号交易服务
+     */
     @Autowired
     CapitalTradeOrderService capitalTradeOrderService;
 
+    /**
+     * 红包交易服务
+     */
     @Autowired
     RedPacketTradeOrderService redPacketTradeOrderService;
 

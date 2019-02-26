@@ -36,10 +36,6 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
             synchronized (SpringTransactionConfigurator.class) {
 
                 if (executorService == null) {
-//                    executorService = new ThreadPoolExecutor(recoverConfig.getAsyncTerminateThreadPoolSize(),
-//                            recoverConfig.getAsyncTerminateThreadPoolSize(),
-//                            0L, TimeUnit.SECONDS,
-//                            new SynchronousQueue<Runnable>());
                     executorService = Executors.newCachedThreadPool();
                 }
             }

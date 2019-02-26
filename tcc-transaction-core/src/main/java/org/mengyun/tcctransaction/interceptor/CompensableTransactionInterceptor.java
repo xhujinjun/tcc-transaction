@@ -48,7 +48,10 @@ public class CompensableTransactionInterceptor {
 
         Compensable compensable = method.getAnnotation(Compensable.class);
         Propagation propagation = compensable.propagation();
-        TransactionContext transactionContext = FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance().get(pjp.getTarget(), method, pjp.getArgs());
+        //事务上下文
+        TransactionContext transactionContext = FactoryBuilder.factoryOf(compensable.transactionContextEditor())
+                                                              .getInstance()
+                                                              .get(pjp.getTarget(), method, pjp.getArgs());
 
         boolean asyncConfirm = compensable.asyncConfirm();
 
@@ -80,36 +83,24 @@ public class CompensableTransactionInterceptor {
      * 5. 清理资源
      */
     private Object rootMethodProceed(ProceedingJoinPoint pjp, boolean asyncConfirm, boolean asyncCancel) throws Throwable {
-
         Object returnValue;
-
         Transaction transaction = null;
-
         try {
-
             transaction = transactionManager.begin();
-
             try {
                 //继续处理try阶段逻辑
                 returnValue = pjp.proceed();
             } catch (Throwable tryingException) {
-
                 if (!isDelayCancelException(tryingException)) {
-                   
                     logger.warn(String.format("compensable transaction trying failed. transaction content:%s", JSON.toJSONString(transaction)), tryingException);
-
                     transactionManager.rollback(asyncCancel);
                 }
-
                 throw tryingException;
             }
-
             transactionManager.commit(asyncConfirm);
-
         } finally {
             transactionManager.cleanAfterCompletion(transaction);
         }
-
         return returnValue;
     }
 
@@ -117,10 +108,8 @@ public class CompensableTransactionInterceptor {
      *
      */
     private Object providerMethodProceed(ProceedingJoinPoint pjp, TransactionContext transactionContext, boolean asyncConfirm, boolean asyncCancel) throws Throwable {
-
         Transaction transaction = null;
         try {
-
             switch (TransactionStatus.valueOf(transactionContext.getStatus())) {
                 case TRYING:
                     transaction = transactionManager.propagationNewBegin(transactionContext);

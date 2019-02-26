@@ -8,10 +8,13 @@ import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 
 /**
+ * 恢复调度的定时任务
  * Created by changming.xie on 6/2/16.
  */
 public class RecoverScheduledJob {
-
+    /**
+     * 回复事务
+     */
     private TransactionRecovery transactionRecovery;
 
     private TransactionConfigurator transactionConfigurator;
